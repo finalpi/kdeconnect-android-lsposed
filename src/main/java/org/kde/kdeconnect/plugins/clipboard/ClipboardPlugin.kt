@@ -21,6 +21,7 @@ import org.kde.kdeconnect.plugins.Plugin
 import org.kde.kdeconnect.plugins.PluginFactory.LoadablePlugin
 import org.kde.kdeconnect.plugins.clipboard.ClipboardListener.ClipboardObserver
 import org.kde.kdeconnect.ui.PluginSettingsFragment
+import org.kde.kdeconnect.plugins.clipboard.lsposed.LsposedClipboardSettings
 import org.kde.kdeconnect_tp.R
 
 @LoadablePlugin
@@ -178,6 +179,7 @@ class ClipboardPlugin : Plugin() {
         private const val PACKET_TYPE_CLIPBOARD_CONNECT = "kdeconnect.clipboard.connect"
 
         fun canSyncAutomatically(context: Context): Boolean {
+            if (LsposedClipboardSettings.isEnabled(context)) return true
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                 return true
             }

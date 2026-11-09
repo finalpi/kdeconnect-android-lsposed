@@ -34,6 +34,7 @@ import org.kde.kdeconnect.backends.lan.LanLinkProvider
 import org.kde.kdeconnect.helpers.NotificationHelper
 import org.kde.kdeconnect.plugins.clipboard.ClipboardFloatingActivity
 import org.kde.kdeconnect.plugins.clipboard.ClipboardPlugin
+import org.kde.kdeconnect.plugins.clipboard.lsposed.ClipboardKeepAlive
 import org.kde.kdeconnect.plugins.runcommand.RunCommandActivity
 import org.kde.kdeconnect.plugins.runcommand.RunCommandPlugin
 import org.kde.kdeconnect.plugins.share.SendFileActivity
@@ -54,6 +55,7 @@ class BackgroundService : Service() {
 
     private var screenOnReceiver: KdeConnectBroadcastReceiver? = null
     private var networkCallback: NetworkCallback? = null
+    private var clipboardKeepAlive: ClipboardKeepAlive? = null
 
     /** Indicates whether device is connected over wifi / usb / bluetooth / (anything other than cellular) */
     val isConnectedToNonCellularNetwork: LiveData<Boolean>
@@ -103,6 +105,7 @@ class BackgroundService : Service() {
         Log.d("KdeConnect/BgService", "onCreate")
         this.applicationInstance = KdeConnect.getInstance()
         instance = this
+        clipboardKeepAlive = ClipboardKeepAlive(this)
 
         KdeConnect.getInstance().addDeviceListChangedCallback("BackgroundService", this::updateForegroundNotification)
 
@@ -126,12 +129,14 @@ class BackgroundService : Service() {
             override fun onAvailable(network: Network) {
                 Log.i("BackgroundService", "Valid network available")
                 isConnectedToNonCellularNetwork.postValue(true)
+                clipboardKeepAlive?.onNetworkChanged(network, true)
                 onNetworkChange(network)
             }
 
             override fun onLost(network: Network) {
                 Log.i("BackgroundService", "Valid network lost")
                 isConnectedToNonCellularNetwork.postValue(false)
+                clipboardKeepAlive?.onNetworkChanged(network, false)
                 onNetworkChange(null)
             }
         }.also {
@@ -238,6 +243,8 @@ class BackgroundService : Service() {
     override fun onDestroy() {
         Log.d("KdeConnect/BgService", "onDestroy")
         initialized = false
+        clipboardKeepAlive?.close()
+        clipboardKeepAlive = null
         for (linkProvider in linkProviders) {
             linkProvider.onStop()
         }

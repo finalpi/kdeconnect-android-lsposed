@@ -38,11 +38,11 @@ android {
     namespace = "org.kde.kdeconnect_tp"
     compileSdk = 37
     defaultConfig {
-        applicationId = "org.kde.kdeconnect_tp"
+        applicationId = "org.kde.kdeconnect_tp.lsposed"
         minSdk = 23
         targetSdk = 37
-        versionCode = 13702
-        versionName = "1.37.2"
+        versionCode = 1370201
+        versionName = "1.37.2-lsposed.1"
         proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
     buildFeatures {
@@ -73,6 +73,14 @@ android {
         }
     }
     signingConfigs {
+        if (providers.environmentVariable("KDE_SIGNING_KEYSTORE").isPresent) {
+            create("personal") {
+                storeFile = file(providers.environmentVariable("KDE_SIGNING_KEYSTORE").get())
+                storePassword = providers.environmentVariable("KDE_SIGNING_PASSWORD").get()
+                keyAlias = "kdeconnect-lsposed"
+                keyPassword = storePassword
+            }
+        }
         getByName("debug") {
             storeFile = file("debug.keystore")
             storePassword = "android"
@@ -91,6 +99,7 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfigs.findByName("personal")?.let { signingConfig = it }
         }
     }
     lint {
@@ -255,6 +264,8 @@ androidComponents {
 }
 
 dependencies {
+    // Loaded only by LSPosed in system_server; the APK remains usable without LSPosed.
+    compileOnly("io.github.libxposed:api:102.0.0")
     // It has a bug that causes a crash when using PosixFilePermission and minSdk < 26.
     // It has been used in SSHD Core.
     // We have taken a workaround to fix it.
@@ -314,6 +325,7 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation("io.github.libxposed:api:102.0.0")
     testImplementation(libs.mockk)
     testImplementation(libs.slf4j.simple) // do not try to use the Android logger backend in tests
     testImplementation(libs.jsonassert)
@@ -349,4 +361,10 @@ tasks.named("generateLicenseReport") {
 
 tasks.named("preBuild") {
     dependsOn("generateLicenseReport")
+}
+
+// Robolectric's Android 16 shared-memory shadow needs this JDK 21 internal API.
+// This applies only to the host test JVM, never to the APK or Android's permissions.
+tasks.withType<Test>().configureEach {
+    jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED")
 }

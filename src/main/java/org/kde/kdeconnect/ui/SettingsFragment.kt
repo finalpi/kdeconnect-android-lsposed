@@ -36,6 +36,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kde.kdeconnect.BackgroundService
+import org.kde.kdeconnect.plugins.clipboard.lsposed.LsposedClipboardSettings
 import org.kde.kdeconnect.extensions.setupBottomPadding
 import org.kde.kdeconnect.helpers.CreateFileParams
 import org.kde.kdeconnect.helpers.CreateFileResultContract
@@ -69,6 +70,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             exportLogsPref(context),
             moreSettingsPref(context),
         ).forEach(screen::addPreference)
+        LsposedClipboardSettings.addPreferences(context, screen)
 
         preferenceScreen = screen
     }
@@ -76,6 +78,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         listView.setupBottomPadding()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LsposedClipboardSettings.refreshHook(requireContext())
+        view?.postDelayed({
+            context?.let { findPreference<Preference>(LsposedClipboardSettings.KEY_STATUS)?.summary =
+                LsposedClipboardSettings.statusSummary(it) }
+        }, 1000)
     }
 
     override fun onDestroyView() {

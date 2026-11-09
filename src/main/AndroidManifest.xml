@@ -58,6 +58,9 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_MMS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <permission android:name="${applicationId}.LSPOSED_CONTROL" android:protectionLevel="signature" />
+    <uses-permission android:name="${applicationId}.LSPOSED_CONTROL" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -75,7 +78,8 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
     <application
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:label="@string/kde_connect"
+        android:label="@string/kde_connect_lsposed"
+        android:description="@string/lsposed_clipboard_summary"
         android:banner="@mipmap/ic_launcher_banner"
         android:supportsRtl="true"
         android:allowBackup="false"
@@ -85,6 +89,11 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
         android:name="org.kde.kdeconnect.KdeConnect"
         android:enableOnBackInvokedCallback="true"
         android:requestLegacyExternalStorage="true"> <!-- requestLegacyExternalStorage is only used in Android 10: https://developer.android.com/training/data-storage/use-cases#opt-out-in-production-app -->
+
+        <provider
+            android:name="org.kde.kdeconnect.plugins.clipboard.lsposed.LsposedClipboardProvider"
+            android:authorities="${applicationId}.lsposedclipboard"
+            android:exported="true" />
 
 
         <receiver

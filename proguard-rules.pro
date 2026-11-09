@@ -20,6 +20,9 @@
 -keepattributes SourceFile,LineNumberTable,Signature,*Annotation*
 -keep class org.kde.kdeconnect.** {*;}
 
+# Provided by LSPosed only in system_server, never packaged into the application.
+-dontwarn io.github.libxposed.**
+
 # SSHd requires mina, and mina uses reflection so some classes would get deleted
 -keep class org.apache.sshd.** {*;}
 -dontwarn org.apache.sshd.**

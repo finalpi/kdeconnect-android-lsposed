@@ -1,4 +1,12 @@
-# KDE Connect - Android app
+# KDE Connect LSPosed
+
+Integrated LSPosed API 102 clipboard sync for Android 14+, including text copied by XposedSmsCode while the phone is locked. No `su` permission or separate WhiteClip APK is required.
+
+[中文安装、兼容范围与验收说明](LSPOSED.md)
+
+Device validation is still required; a successful build is not evidence of compatibility with every Android version or ROM.
+
+## Upstream KDE Connect - Android app
 
 KDE Connect is a multi-platform app that allows your devices to communicate (eg: your phone and your computer).
 

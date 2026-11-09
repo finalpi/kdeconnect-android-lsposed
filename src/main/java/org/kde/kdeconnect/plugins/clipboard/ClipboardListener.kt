@@ -11,16 +11,16 @@ import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import androidx.core.content.getSystemService
 import org.kde.kdeconnect.helpers.ThreadHelper
+import org.kde.kdeconnect.plugins.clipboard.lsposed.LsposedClipboardSettings
 import org.kde.kdeconnect_tp.BuildConfig
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.CopyOnWriteArraySet
 
 class ClipboardListener {
     enum class ClipboardContentType {
@@ -32,7 +32,7 @@ class ClipboardListener {
         fun clipboardChanged(content: String, contentType: ClipboardContentType)
     }
 
-    private val observers: HashSet<ClipboardObserver> = HashSet()
+    private val observers = CopyOnWriteArraySet<ClipboardObserver>()
 
     private val context: Context
     var currentContent: String? = null
@@ -42,15 +42,13 @@ class ClipboardListener {
     var updateTimestamp: Long = 0
         private set
 
-    private lateinit var cm: ClipboardManager
+    private val cm: ClipboardManager
 
     private constructor(ctx: Context) {
         context = ctx.applicationContext
-        Handler(Looper.getMainLooper()).post {
-            cm = context.getSystemService<ClipboardManager>()!!
-            cm.addPrimaryClipChangedListener { this.onClipboardChanged() }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && ClipboardPlugin.canSyncAutomatically(context)) {
+        cm = context.getSystemService<ClipboardManager>()!!
+        cm.addPrimaryClipChangedListener { this.onClipboardChanged() }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !LsposedClipboardSettings.isEnabled(context) && ClipboardPlugin.canSyncAutomatically(context)) {
             ThreadHelper.runOnNewThread {
                 try {
                     val timeStamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US).format(Date())
@@ -59,7 +57,7 @@ class ClipboardListener {
                     val process = Runtime.getRuntime().exec(arrayOf<String>("logcat", "-T", timeStamp, logcatFilter, "*:S"))
                     val bufferedReader = BufferedReader(InputStreamReader(process.inputStream))
                     bufferedReader.forEachLine { line ->
-                        if (line.contains(BuildConfig.APPLICATION_ID)) {
+                        if (line.contains(BuildConfig.APPLICATION_ID) && !LsposedClipboardSettings.isEnabled(context)) {
                             context.startActivity(ClipboardFloatingActivity.getIntent(context, false))
                         }
                     }
@@ -77,44 +75,52 @@ class ClipboardListener {
     }
 
     fun onClipboardChanged() {
+        if (LsposedClipboardSettings.isEnabled(context)) return // System hook already supplies the value, including while locked.
         try {
-            val clip = cm.primaryClip!!
+            val clip = cm.primaryClip ?: return // A denied locked-screen read is not a clipboard clear.
+            if (clip.itemCount == 0) return
             val item = clip.getItemAt(0)
             val content = item.coerceToText(context).toString()
             val contentType = detectContentType(clip)
 
-            if (content == currentContent && contentType == currentContentType) {
-                return
-            }
-            updateTimestamp = System.currentTimeMillis()
-            currentContent = content
-            currentContentType = contentType
-
-            for (observer in observers) {
-                observer.clipboardChanged(content, contentType)
-            }
+            updateContent(content, contentType, System.currentTimeMillis())
         } catch (_: Exception) {
             //Probably clipboard was not text
         }
     }
 
-    fun setText(text: String?) {
-        if (this::cm.isInitialized) {
-            if (text == currentContent) {
-                return
-            }
-            updateTimestamp = System.currentTimeMillis()
-            currentContent = text
+    fun onLsposedClipboardChanged(content: String?, sensitive: Boolean, timestamp: Long) {
+        if (timestamp < updateTimestamp) return
+        if (content == null) {
+            currentContent = null
+            updateTimestamp = timestamp
             currentContentType = ClipboardContentType.Text
-            cm.setPrimaryClip(ClipData.newPlainText(null, text))
+            return // Do not resend an auto-cleared OTP when a peer reconnects.
         }
+        updateContent(content, if (sensitive) ClipboardContentType.Password else ClipboardContentType.Text, timestamp)
+    }
+
+    private fun updateContent(content: String, contentType: ClipboardContentType, timestamp: Long) {
+        if (content == currentContent && contentType == currentContentType) return
+        updateTimestamp = timestamp
+        currentContent = content
+        currentContentType = contentType
+        observers.toList().forEach { it.clipboardChanged(content, contentType) }
+    }
+
+    fun setText(text: String?) {
+        if (text == currentContent) return
+        cm.setPrimaryClip(ClipData.newPlainText(null, text))
+        updateTimestamp = System.currentTimeMillis()
+        currentContent = text
+        currentContentType = ClipboardContentType.Text
     }
 
     companion object {
         private var _instance: ClipboardListener? = null
 
+        @Synchronized
         fun instance(context: Context): ClipboardListener {
-            // FIXME: The _instance we return won't be completely initialized yet since initialization happens on a new thread (why?)
             return _instance ?: ClipboardListener(context).also { _instance = it }
         }
 
