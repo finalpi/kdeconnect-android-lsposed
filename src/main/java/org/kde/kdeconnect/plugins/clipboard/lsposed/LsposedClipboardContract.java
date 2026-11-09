@@ -10,6 +10,7 @@ public final class LsposedClipboardContract {
     public static final String ACTION_REFRESH = BuildConfig.APPLICATION_ID + ".LSPOSED_REFRESH";
     public static final String CONTROL_PERMISSION = BuildConfig.APPLICATION_ID + ".LSPOSED_CONTROL";
     public static final int MAX_TEXT_LENGTH = 131072;
+    public static final String REMOTE_GROUP = "clipboard_control";
 
     private LsposedClipboardContract() { }
 

@@ -11,4 +11,12 @@
     <string name="lsposed_status_waiting">尚未收到近期响应。请在 LSPosed 中为本模块启用系统服务作用域（system），重启后重新打开此页。API 102 下仅勾选 android 不能加载到 system_server。ROM 接口不兼容也会显示此状态。</string>
     <string name="lsposed_battery_title">允许后台持续运行</string>
     <string name="lsposed_battery_summary">请允许电池优化豁免，并按 ROM 要求开启自启动，以便锁屏后继续同步。本应用不申请 root 权限。</string>
+    <string name="lsposed_status_no_framework">框架服务尚未连接到本应用。请在 LSPosed 中确认启用的是当前安装的包；持续不连接时请复制诊断信息。</string>
+    <string name="lsposed_status_missing_scope">框架已连接，但框架返回的作用域不包含 system。请检查 LSPosed 中本模块的作用域。</string>
+    <string name="lsposed_status_old_module">系统进程报告模块版本 %1$d，当前应用版本为 %2$d，系统仍在运行其他版本的模块。</string>
+    <string name="lsposed_status_stage">系统模块已响应。阶段：%1$s；错误：%2$s。请复制诊断信息定位失败位置。</string>
+    <string name="lsposed_status_injection">框架：%1$s。系统注入目标：%2$s。剪贴板握手尚未成功，请复制诊断信息。</string>
+    <string name="lsposed_copy_diagnostics">复制剪贴板诊断信息</string>
+    <string name="lsposed_copy_diagnostics_summary">复制框架、作用域、加载版本及错误阶段，不含剪贴板正文、短信或验证码。</string>
+    <string name="lsposed_status_framework_error">框架服务已连接，但诊断查询失败：%1$s。请复制诊断信息；这不代表作用域或注入一定缺失。</string>
 </resources>

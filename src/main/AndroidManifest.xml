@@ -95,6 +95,15 @@ SPDX-License-Identifier: GPL-2.0-only OR GPL-3.0-only OR LicenseRef-KDE-Accepted
             android:authorities="${applicationId}.lsposedclipboard"
             android:exported="true" />
 
+        <!-- KdeConnect initialization uses credential-protected storage. Defer the
+             framework's app-side service provider until the first user unlock. -->
+        <provider
+            android:name="io.github.libxposed.service.XposedProvider"
+            android:authorities="${applicationId}.XposedService"
+            android:directBootAware="false"
+            android:exported="true"
+            tools:replace="android:directBootAware" />
+
 
         <receiver
             android:name="com.android.mms.transaction.PushReceiver"

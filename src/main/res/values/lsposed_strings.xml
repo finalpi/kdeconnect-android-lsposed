@@ -11,4 +11,12 @@
     <string name="lsposed_status_waiting">No recent response. Enable this module for the system server (system) scope in LSPosed, reboot, then reopen this screen. The android package alone does not target system_server in API 102. Unsupported ROM methods also cause this state.</string>
     <string name="lsposed_battery_title">Allow unrestricted background operation</string>
     <string name="lsposed_battery_summary">Allow the battery exemption and your ROM’s autostart permission to keep syncing while locked. No root prompt is required.</string>
+    <string name="lsposed_status_no_framework">The Xposed service has not connected to this app. Open LSPosed and confirm this installed package is enabled. Copy diagnostics if it remains disconnected.</string>
+    <string name="lsposed_status_missing_scope">Framework connected, but its reported scope does not contain system. Check the module scope in LSPosed.</string>
+    <string name="lsposed_status_old_module">System process reports module %1$d; installed app is %2$d. The system is still running a different module version.</string>
+    <string name="lsposed_status_stage">System module responded. Stage: %1$s; error: %2$s. Copy diagnostics to locate the failure.</string>
+    <string name="lsposed_status_injection">Framework: %1$s. System targets: %2$s. No successful clipboard handshake yet; copy diagnostics.</string>
+    <string name="lsposed_copy_diagnostics">Copy clipboard diagnostics</string>
+    <string name="lsposed_copy_diagnostics_summary">Copies framework, scope, loaded version and error stage. Does not include clipboard text, SMS or verification codes.</string>
+    <string name="lsposed_status_framework_error">Framework service connected, but a diagnostic query failed: %1$s. Copy diagnostics; this does not prove that scope or injection is missing.</string>
 </resources>

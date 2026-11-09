@@ -10,6 +10,8 @@ import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.CHECKCAST
 import org.objectweb.asm.Opcodes.INVOKESTATIC
+import java.security.KeyStore
+import java.security.MessageDigest
 
 buildscript {
     dependencies {
@@ -28,6 +30,12 @@ plugins {
 
 val licenseResDir = "$projectDir/build/dependency-license-res"
 
+fun signingDigest(config: com.android.build.api.dsl.ApkSigningConfig): String {
+    val store = KeyStore.getInstance(config.storeFile!!, config.storePassword!!.toCharArray())
+    return MessageDigest.getInstance("SHA-256").digest(store.getCertificate(config.keyAlias).encoded)
+        .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_11
@@ -39,10 +47,11 @@ android {
     compileSdk = 37
     defaultConfig {
         applicationId = "org.kde.kdeconnect_tp.lsposed"
-        minSdk = 23
+        minSdk = 34
         targetSdk = 37
-        versionCode = 1370202
-        versionName = "1.37.2-lsposed.2"
+        versionCode = 1370203
+        versionName = "1.37.2-lsposed.3"
+        buildConfigField("String", "LSPOSED_SIGNER_SHA256", "\"\"")
         proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
     buildFeatures {
@@ -93,6 +102,7 @@ android {
             isMinifyEnabled = false
             isShrinkResources = false
             signingConfig = signingConfigs.getByName("debug")
+            buildConfigField("String", "LSPOSED_SIGNER_SHA256", "\"${signingDigest(signingConfigs.getByName("debug"))}\"")
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
         }
@@ -100,6 +110,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfigs.findByName("personal")?.let { signingConfig = it }
+            signingConfig?.let { buildConfigField("String", "LSPOSED_SIGNER_SHA256", "\"${signingDigest(it)}\"") }
         }
     }
     lint {
@@ -266,6 +277,7 @@ androidComponents {
 dependencies {
     // Loaded only by LSPosed in system_server; the APK remains usable without LSPosed.
     compileOnly("io.github.libxposed:api:102.0.0")
+    implementation("io.github.libxposed:service:102.0.0")
     // It has a bug that causes a crash when using PosixFilePermission and minSdk < 26.
     // It has been used in SSHD Core.
     // We have taken a workaround to fix it.

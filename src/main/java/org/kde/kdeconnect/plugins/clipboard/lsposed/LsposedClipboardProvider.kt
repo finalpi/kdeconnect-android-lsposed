@@ -23,19 +23,9 @@ class LsposedClipboardProvider : ContentProvider() {
         val enabled = LsposedClipboardSettings.isEnabled(ctx)
         when (method) {
             "status" -> {
-                prefs.edit().putLong("lsposed_hook_seen", android.os.SystemClock.elapsedRealtime())
-                    .putString("lsposed_hook_method", extras?.getString("method", "")).apply()
+                extras?.let { LsposedClipboardSettings.recordDiagnostics(ctx, it) }
             }
-            "clipboard" -> if (enabled && LsposedClipboardContract.acceptsEvent(extras, Process.myUid() / 100000,
-                    prefs.getLong("lsposed_enabled_at", Long.MAX_VALUE))) {
-                val event = Bundle(extras!!)
-                Handler(Looper.getMainLooper()).post {
-                    if (LsposedClipboardSettings.isEnabled(ctx)) {
-                        ClipboardListener.instance(ctx).onLsposedClipboardChanged(event.getString("text"),
-                            event.getBoolean("sensitive"), event.getLong("time"))
-                    }
-                }
-            }
+            "clipboard" -> LsposedClipboardDelivery.accept(ctx, extras)
             else -> throw IllegalArgumentException("Unknown bridge operation")
         }
         return Bundle().apply { putBoolean("enabled", enabled) }
