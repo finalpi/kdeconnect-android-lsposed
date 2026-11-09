@@ -2,10 +2,14 @@
 
 这是 KDE Connect Android 的个人 fork。一个 APK 同时提供 KDE Connect 应用和 LSPosed API 102 模块，不申请 `su` 权限，也不需要另装 WhiteClip。
 
+## 1.37.2-lsposed.2 修复
+
+修正 API 102 的系统服务作用域：`system_server` 必须使用 `system`，上一版仅写 `android` 会导致系统 hook 无法加载。升级后请重新确认模块作用域并重启；同时恢复 Android 普通剪贴板监听作为前台回退。
+
 ## 安装与设置
 
 1. 安装本 fork 的 APK。包名为 `org.kde.kdeconnect_tp.lsposed`，可与官方版共存；配对和设置需要重新配置。调试包另有 `.debug` 后缀。
-2. 在 LSPosed 中启用 **KDE Connect LSPosed**，作用域选 **系统框架（android）**，然后重启手机。模块不支持热重载，更新模块后也需要重启。
+2. 在 LSPosed 中启用 **KDE Connect LSPosed**，作用域选 **系统服务（system）**，然后重启手机。模块不支持热重载，更新模块后也需要重启。
 3. 打开应用，在设置中开启“通过 LSPosed 同步剪贴板”和“熄屏后继续同步”。重新进入设置页，确认“系统 hook 已连接”。
 4. 允许应用的常驻通知、电池优化豁免，以及 ROM 要求的自启动或无限制后台运行。应用内“允许后台持续运行”可打开系统设置。熄屏保活会增加耗电。
 5. 与电脑重新配对，为对应设备启用“共享剪贴板”。测试时暂停官方版的剪贴板同步，避免两个应用互相同步。

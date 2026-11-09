@@ -2,6 +2,8 @@
 package org.kde.kdeconnect.plugins.clipboard
 
 import android.content.pm.ProviderInfo
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.os.Bundle
 import androidx.test.core.app.ApplicationProvider
 import android.app.Application
@@ -87,6 +89,20 @@ class LsposedClipboardTest {
     @Test fun onlySystemUidCanCallBridge() {
         assertTrue(LsposedClipboardContract.isTrustedCaller(1000))
         listOf(0, 2000, 10001, 101000).forEach { assertFalse(LsposedClipboardContract.isTrustedCaller(it)) }
+    }
+
+    @Test fun configuredHookDoesNotDisableForegroundListener() {
+        val ctx = ApplicationProvider.getApplicationContext<Application>()
+        val prefs = LsposedClipboardSettings.preferences(ctx)
+        prefs.edit().putBoolean(LsposedClipboardSettings.KEY_ENABLED, true).apply()
+        try {
+            ctx.getSystemService<ClipboardManager>()!!.setPrimaryClip(ClipData.newPlainText(null, "foreground fallback"))
+            listener.onClipboardChanged()
+            shadowOf(Looper.getMainLooper()).idle()
+            assertEquals("foreground fallback", received.single().first)
+        } finally {
+            prefs.edit().remove(LsposedClipboardSettings.KEY_ENABLED).apply()
+        }
     }
 
     @Test fun providerDeliversOnlyEnabledAuthenticatedEvents() {

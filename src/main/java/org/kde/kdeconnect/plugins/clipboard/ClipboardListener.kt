@@ -75,7 +75,8 @@ class ClipboardListener {
     }
 
     fun onClipboardChanged() {
-        if (LsposedClipboardSettings.isEnabled(context)) return // System hook already supplies the value, including while locked.
+        // Keep Android's ordinary listener as a fallback when a read is permitted.
+        // A configured but unavailable system hook must not disable foreground sync.
         try {
             val clip = cm.primaryClip ?: return // A denied locked-screen read is not a clipboard clear.
             if (clip.itemCount == 0) return

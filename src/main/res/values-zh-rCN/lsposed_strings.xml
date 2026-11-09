@@ -3,12 +3,12 @@
     <string name="kde_connect_lsposed">KDE Connect LSPosed</string>
     <string name="lsposed_settings_title">LSPosed 剪贴板</string>
     <string name="lsposed_clipboard_title">通过 LSPosed 同步剪贴板</string>
-    <string name="lsposed_clipboard_summary">需要 Android 14+ 和 LSPosed API 102。请在 LSPosed 中为本应用启用“系统框架”作用域并重启。可同步 XposedSmsCode 在锁屏时复制的验证码。目前仅支持 Android 主用户及默认设备剪贴板。</string>
+    <string name="lsposed_clipboard_summary">需要 Android 14+ 和 LSPosed API 102。请在 LSPosed 中为本应用启用系统服务作用域（system）并重启。可同步 XposedSmsCode 在锁屏时复制的验证码。目前仅支持 Android 主用户及默认设备剪贴板。</string>
     <string name="lsposed_keep_alive_title">熄屏后继续同步</string>
     <string name="lsposed_keep_alive_summary">启用 LSPosed 同步且有本地网络时，保持 CPU 和 Wi-Fi 工作。会增加耗电，不会点亮屏幕。</string>
     <string name="lsposed_status_title">检查系统剪贴板通道</string>
     <string name="lsposed_status_active">系统 hook 已连接。请为需要同步的已配对设备启用“共享剪贴板”。敏感内容仍遵循该设备的剪贴板设置。</string>
-    <string name="lsposed_status_waiting">尚未收到近期响应。请在 LSPosed 中为本模块启用“系统框架”，重启后重新打开此页。ROM 接口不兼容也会显示此状态。</string>
+    <string name="lsposed_status_waiting">尚未收到近期响应。请在 LSPosed 中为本模块启用系统服务作用域（system），重启后重新打开此页。API 102 下仅勾选 android 不能加载到 system_server。ROM 接口不兼容也会显示此状态。</string>
     <string name="lsposed_battery_title">允许后台持续运行</string>
     <string name="lsposed_battery_summary">请允许电池优化豁免，并按 ROM 要求开启自启动，以便锁屏后继续同步。本应用不申请 root 权限。</string>
 </resources>

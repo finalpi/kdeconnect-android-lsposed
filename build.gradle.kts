@@ -41,8 +41,8 @@ android {
         applicationId = "org.kde.kdeconnect_tp.lsposed"
         minSdk = 23
         targetSdk = 37
-        versionCode = 1370201
-        versionName = "1.37.2-lsposed.1"
+        versionCode = 1370202
+        versionName = "1.37.2-lsposed.2"
         proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
     buildFeatures {

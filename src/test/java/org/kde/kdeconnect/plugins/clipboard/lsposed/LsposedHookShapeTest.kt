@@ -6,6 +6,14 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class LsposedHookShapeTest {
+    @Test fun api102ModuleTargetsSystemServer() {
+        // External API 102 contract: android targets framework UI processes, while
+        // the virtual package system is required for onSystemServerStarting().
+        val scopes = requireNotNull(javaClass.classLoader!!.getResourceAsStream("META-INF/xposed/scope.list"))
+            .bufferedReader().use { it.readLines().map(String::trim).filter(String::isNotEmpty) }
+        assertTrue("API 102 system_server scope is missing from packaged resources", "system" in scopes)
+    }
+
     // Model the structural contract from AOSP 14/15/16 and a future added argument.
     private class Clipboard(@JvmField val userId: Int = 0, @JvmField val deviceId: Int = 0)
     private class Methods {

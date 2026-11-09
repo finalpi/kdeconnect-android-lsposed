@@ -3,12 +3,12 @@
     <string name="kde_connect_lsposed">KDE Connect LSPosed</string>
     <string name="lsposed_settings_title">LSPosed clipboard</string>
     <string name="lsposed_clipboard_title">Sync clipboard through LSPosed</string>
-    <string name="lsposed_clipboard_summary">Requires Android 14+ and LSPosed API 102. Enable this app for System Framework in LSPosed and reboot. Includes text copied by XposedSmsCode while locked. Only the main Android user and default device clipboard are supported.</string>
+    <string name="lsposed_clipboard_summary">Requires Android 14+ and LSPosed API 102. Enable this app for the system server (system) scope in LSPosed and reboot. Includes text copied by XposedSmsCode while locked. Only the main Android user and default device clipboard are supported.</string>
     <string name="lsposed_keep_alive_title">Keep syncing with the screen off</string>
     <string name="lsposed_keep_alive_summary">Keep the CPU and Wi-Fi active while LSPosed sync is enabled and a local network is available. Increases battery use; does not turn the screen on.</string>
     <string name="lsposed_status_title">Check system clipboard bridge</string>
     <string name="lsposed_status_active">System hook connected. Enable Shared clipboard for each paired device. Sensitive content follows that device’s clipboard setting.</string>
-    <string name="lsposed_status_waiting">No recent response. Enable this module for System Framework in LSPosed, reboot, then reopen this screen. Unsupported ROM methods also cause this state.</string>
+    <string name="lsposed_status_waiting">No recent response. Enable this module for the system server (system) scope in LSPosed, reboot, then reopen this screen. The android package alone does not target system_server in API 102. Unsupported ROM methods also cause this state.</string>
     <string name="lsposed_battery_title">Allow unrestricted background operation</string>
     <string name="lsposed_battery_summary">Allow the battery exemption and your ROM’s autostart permission to keep syncing while locked. No root prompt is required.</string>
 </resources>
