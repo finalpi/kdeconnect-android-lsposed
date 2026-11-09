@@ -59,6 +59,7 @@ class LsposedClipboardTest {
         assertEquals(1, received.size)
         listener.setText("from desktop")
         shadowOf(Looper.getMainLooper()).idle()
+        assertEquals("A remote write must not be sent back by the native listener", 1, received.size)
         received.clear()
         listener.onLsposedClipboardChanged("from desktop", false, System.currentTimeMillis() + 1)
         assertTrue(received.isEmpty())

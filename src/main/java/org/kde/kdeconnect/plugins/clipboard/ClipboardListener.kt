@@ -111,10 +111,24 @@ class ClipboardListener {
 
     fun setText(text: String?) {
         if (text == currentContent) return
-        cm.setPrimaryClip(ClipData.newPlainText(null, text))
+        val previousContent = currentContent
+        val previousType = currentContentType
+        val previousTimestamp = updateTimestamp
         updateTimestamp = System.currentTimeMillis()
         currentContent = text
         currentContentType = ClipboardContentType.Text
+        val writeTimestamp = updateTimestamp
+        try {
+            // Publish the remote value before Android can invoke a native callback.
+            cm.setPrimaryClip(ClipData.newPlainText(null, text))
+        } catch (error: Exception) {
+            if (currentContent == text && updateTimestamp == writeTimestamp) {
+                currentContent = previousContent
+                currentContentType = previousType
+                updateTimestamp = previousTimestamp
+            }
+            throw error
+        }
     }
 
     companion object {
