@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_source_unreadable">无法读取所选文件，请在 KDE Connect 中重新选择后发送。</string>
+    <string name="screenshot_clipboard_title">截图同步到电脑剪贴板</string>
+    <string name="screenshot_clipboard_enable">自动同步新截图</string>
+    <string name="screenshot_target">目标电脑</string>
+    <string name="screenshot_choose_target">请先配对并选择一台电脑。</string>
+    <string name="screenshot_clipboard_summary">新截图沿用普通剪贴板同步的设备范围，发送到已配对、在线且支持图片剪贴板的设备，不补发历史截图。使用 KDE Connect 内置剪贴板插件，无需选择目标电脑。</string>
+</resources>

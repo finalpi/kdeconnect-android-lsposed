@@ -17,6 +17,8 @@ import androidx.annotation.WorkerThread
 import androidx.documentfile.provider.DocumentFile
 import org.kde.kdeconnect.NetworkPacket
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileInputStream
 import java.nio.charset.StandardCharsets
 
 object FilesHelper {
@@ -109,7 +111,15 @@ object FilesHelper {
     fun uriToNetworkPacket(context: Context, uri: Uri, type: String): NetworkPacket? {
         try {
             val contentResolver = context.contentResolver
-            val inputStream = contentResolver.openInputStream(uri)
+            var localFallback: File? = null
+            val inputStream = try {
+                contentResolver.openInputStream(uri)
+            } catch (error: FileNotFoundException) {
+                val file = SharedLocalFileFallback.forUnavailableProvider(context, uri, error) ?: throw error
+                localFallback = file
+                Log.w(TAG, "Source provider unavailable; reading an already-authorized shared-storage file")
+                FileInputStream(file)
+            } ?: throw FileNotFoundException("Selected file did not provide a readable stream")
 
             val packet = NetworkPacket(type)
 
@@ -155,8 +165,9 @@ object FilesHelper {
                 return Triple(null, sizeDefault, null)
             }
 
-            val (filename, size, lastModified) = when (uri.scheme) {
-                "file" -> fileSchemeExtract()
+            val (filename, size, lastModified) = when {
+                localFallback != null -> Triple(localFallback.name, localFallback.length(), localFallback.lastModified())
+                uri.scheme == "file" -> fileSchemeExtract()
                 else -> contentResolverExtract()
             }
 

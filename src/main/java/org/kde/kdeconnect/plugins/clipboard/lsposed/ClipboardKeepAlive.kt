@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
 import androidx.core.content.getSystemService
+import org.kde.kdeconnect.plugins.clipboard.screenshot.ScreenshotSettings
 
 /** Optional CPU/Wi-Fi locks; the display stays off. No su or device-wide Doze changes. */
 class ClipboardKeepAlive(private val context: Context) : SharedPreferences.OnSharedPreferenceChangeListener {
@@ -33,13 +34,13 @@ class ClipboardKeepAlive(private val context: Context) : SharedPreferences.OnSha
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        if (key == LsposedClipboardSettings.KEY_ENABLED || key == LsposedClipboardSettings.KEY_KEEP_ALIVE)
+        if (key == LsposedClipboardSettings.KEY_ENABLED || key == LsposedClipboardSettings.KEY_KEEP_ALIVE || key == ScreenshotSettings.ENABLED)
             main.post { if (!stopped) updateLocks() }
     }
 
     @Suppress("DEPRECATION")
     private fun updateLocks() {
-        val enabled = networks.isNotEmpty() && LsposedClipboardSettings.isEnabled(context) &&
+        val enabled = networks.isNotEmpty() && (LsposedClipboardSettings.isEnabled(context) || ScreenshotSettings.enabled(context)) &&
             LsposedClipboardSettings.preferences(context).getBoolean(LsposedClipboardSettings.KEY_KEEP_ALIVE, true)
         if (!enabled) { releaseLocks(); return }
         if (cpuLock == null) {

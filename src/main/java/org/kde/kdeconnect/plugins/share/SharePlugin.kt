@@ -235,6 +235,9 @@ class SharePlugin : Plugin() {
     fun sendFiles(uriList: List<Uri>, onComplete: (() -> Unit)? = null) {
         //Read all the data early, as we only have permissions to do it while the activity is alive
         val packets = uriList.mapNotNull { uriToNetworkPacket(context, it, PACKET_TYPE_SHARE_REQUEST) }
+        if (packets.size != uriList.size) {
+            handler.post { Toast.makeText(context, R.string.share_source_unreadable, Toast.LENGTH_LONG).show() }
+        }
 
         try {
             if (packets.isEmpty()) {

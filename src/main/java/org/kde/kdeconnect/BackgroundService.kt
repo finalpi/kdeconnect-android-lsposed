@@ -35,6 +35,7 @@ import org.kde.kdeconnect.helpers.NotificationHelper
 import org.kde.kdeconnect.plugins.clipboard.ClipboardFloatingActivity
 import org.kde.kdeconnect.plugins.clipboard.ClipboardPlugin
 import org.kde.kdeconnect.plugins.clipboard.lsposed.ClipboardKeepAlive
+import org.kde.kdeconnect.plugins.clipboard.screenshot.ScreenshotSync
 import org.kde.kdeconnect.plugins.runcommand.RunCommandActivity
 import org.kde.kdeconnect.plugins.runcommand.RunCommandPlugin
 import org.kde.kdeconnect.plugins.share.SendFileActivity
@@ -56,6 +57,7 @@ class BackgroundService : Service() {
     private var screenOnReceiver: KdeConnectBroadcastReceiver? = null
     private var networkCallback: NetworkCallback? = null
     private var clipboardKeepAlive: ClipboardKeepAlive? = null
+    private var screenshotSync: ScreenshotSync? = null
 
     /** Indicates whether device is connected over wifi / usb / bluetooth / (anything other than cellular) */
     val isConnectedToNonCellularNetwork: LiveData<Boolean>
@@ -106,6 +108,7 @@ class BackgroundService : Service() {
         this.applicationInstance = KdeConnect.getInstance()
         instance = this
         clipboardKeepAlive = ClipboardKeepAlive(this)
+        screenshotSync = ScreenshotSync(this)
 
         KdeConnect.getInstance().addDeviceListChangedCallback("BackgroundService", this::updateForegroundNotification)
 
@@ -245,6 +248,8 @@ class BackgroundService : Service() {
         initialized = false
         clipboardKeepAlive?.close()
         clipboardKeepAlive = null
+        screenshotSync?.close()
+        screenshotSync = null
         for (linkProvider in linkProviders) {
             linkProvider.onStop()
         }

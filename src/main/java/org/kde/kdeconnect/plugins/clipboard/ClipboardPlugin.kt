@@ -112,7 +112,7 @@ class ClipboardPlugin : Plugin() {
 
     override val supportedPacketTypes: Array<String> = arrayOf(PACKET_TYPE_CLIPBOARD, PACKET_TYPE_CLIPBOARD_CONNECT)
 
-    override val outgoingPacketTypes: Array<String> = arrayOf(PACKET_TYPE_CLIPBOARD, PACKET_TYPE_CLIPBOARD_CONNECT)
+    override val outgoingPacketTypes: Array<String> = arrayOf(PACKET_TYPE_CLIPBOARD, PACKET_TYPE_CLIPBOARD_CONNECT, PACKET_TYPE_CLIPBOARD_FILE)
 
     override fun getUiButtons(): List<PluginUiButton> {
         return if (!canSyncAutomatically(context)) {
@@ -150,6 +150,7 @@ class ClipboardPlugin : Plugin() {
     }
 
     companion object {
+        const val PACKET_TYPE_CLIPBOARD_FILE = "kdeconnect.clipboard.file"
         /**
          * Packet containing just clipboard contents, sent when a device updates its clipboard.
          *

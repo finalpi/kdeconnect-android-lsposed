@@ -37,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.kde.kdeconnect.BackgroundService
 import org.kde.kdeconnect.plugins.clipboard.lsposed.LsposedClipboardSettings
+import org.kde.kdeconnect.plugins.clipboard.screenshot.ScreenshotSettings
 import org.kde.kdeconnect.extensions.setupBottomPadding
 import org.kde.kdeconnect.helpers.CreateFileParams
 import org.kde.kdeconnect.helpers.CreateFileResultContract
@@ -48,6 +49,12 @@ import org.kde.kdeconnect_tp.BuildConfig
 import org.kde.kdeconnect_tp.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
+    private val screenshotPhotosPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) {
+            ScreenshotSettings.enable(requireContext(), true)
+            findPreference<SwitchPreference>(ScreenshotSettings.ENABLED)?.isChecked = true
+        }
+    }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         if (activity != null) {
             (activity as? MainActivity)?.supportActionBar?.setTitle(R.string.settings)
@@ -71,6 +78,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             moreSettingsPref(context),
         ).forEach(screen::addPreference)
         LsposedClipboardSettings.addPreferences(context, screen)
+        ScreenshotSettings.addPreferences(context, screen) { screenshotPhotosPermission.launch(Manifest.permission.READ_MEDIA_IMAGES) }
 
         preferenceScreen = screen
     }

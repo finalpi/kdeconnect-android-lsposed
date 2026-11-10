@@ -9,6 +9,7 @@ package org.kde.kdeconnect.plugins.share
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -123,6 +124,7 @@ class ShareActivity : BaseActivity<ActivityShareBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i("ShareUriCompat", "Incoming share flags=${intent.flags} clipItems=${intent.clipData?.itemCount ?: 0}")
 
         shareStarted = savedInstanceState?.getBoolean(KEY_SHARE_STARTED) ?: false
 

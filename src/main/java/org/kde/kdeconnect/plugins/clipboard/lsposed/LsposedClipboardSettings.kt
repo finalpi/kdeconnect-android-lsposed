@@ -114,6 +114,7 @@ object LsposedClipboardSettings {
             "module=${prefs.getLong("lsposed_hook_version", 0)} method=${prefs.getString("lsposed_hook_method", "")}",
             "transport=${prefs.getString("lsposed_hook_transport", "")}",
             "enabled=${isEnabled(context)} captured=${prefs.getLong("lsposed_hook_events", 0)} accepted=${prefs.getLong("lsposed_events_accepted", 0)}",
+            "screenshots=${prefs.getBoolean("screenshot_clipboard_enabled", false)} status=${prefs.getString("screenshot_last_status", "disabled")} last_sent=${prefs.getLong("screenshot_last_sent", 0)}",
         ).joinToString("\n")
     }
 

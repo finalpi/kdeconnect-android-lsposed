@@ -1,0 +1,7 @@
+{
+  "baseKdeTag": "v26.08.2",
+  "qtVersion": "6.11.1",
+  "frameworksVersion": "6.30.0",
+  "architecture": "x64",
+  "runtimeCoreSha256": "926c335e8e446abd8d43500b67177ee9d5a95a3673d2439067a5ba4f75c24e30"
+}

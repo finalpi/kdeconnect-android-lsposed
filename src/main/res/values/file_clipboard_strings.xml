@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_source_unreadable">Could not read a selected file. Select it again from KDE Connect to send it.</string>
+    <string name="screenshot_clipboard_title">Screenshot to PC clipboard</string>
+    <string name="screenshot_clipboard_enable">Automatically sync new screenshots</string>
+    <string name="screenshot_target">Target computer</string>
+    <string name="screenshot_choose_target">Pair and select a computer first.</string>
+    <string name="screenshot_clipboard_summary">New screenshots follow the normal shared-clipboard device scope. Sends to online paired devices with clipboard image support; does not resend screenshot history. Uses KDE Connect’s integrated clipboard plugin.</string>
+</resources>
