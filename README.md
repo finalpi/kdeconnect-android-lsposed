@@ -4,7 +4,7 @@ Integrated LSPosed API 102 clipboard sync for Android 14+, including text copied
 
 [中文安装、兼容范围与验收说明](LSPOSED.md)
 
-截图自动同步与 CX 文件分享兼容见 [功能说明](SCREENSHOT-CLIPBOARD.md)。截图功能沿用普通剪贴板的设备范围，电脑端更新原生剪贴板插件，不增加辅助程序。
+截图自动同步与 CX 文件分享兼容见 [功能说明](SCREENSHOT-CLIPBOARD.md)。截图功能沿用普通剪贴板的设备范围，电脑端使用 [桌面 fork 的完整安装包](https://github.com/finalpi/kdeconnect-kde/releases)，不需要单独安装插件或辅助程序。
 
 Device validation is still required; a successful build is not evidence of compatibility with every Android version or ROM.
 
