@@ -41,6 +41,11 @@ class ClipboardPlugin : Plugin() {
     }
 
     override fun onPacketReceived(np: NetworkPacket): Boolean {
+        if (np.type == PACKET_TYPE_CLIPBOARD_FILE) {
+            return ClipboardImageReceiver.receive(context, np) {
+                device.isPaired && device.getPlugin<ClipboardPlugin>() === this
+            }
+        }
         val content = np.getString("content")
         when (np.type) {
             (PACKET_TYPE_CLIPBOARD) -> {
@@ -110,7 +115,7 @@ class ClipboardPlugin : Plugin() {
         ClipboardListener.instance(context).removeObserver(observer)
     }
 
-    override val supportedPacketTypes: Array<String> = arrayOf(PACKET_TYPE_CLIPBOARD, PACKET_TYPE_CLIPBOARD_CONNECT)
+    override val supportedPacketTypes: Array<String> = arrayOf(PACKET_TYPE_CLIPBOARD, PACKET_TYPE_CLIPBOARD_CONNECT, PACKET_TYPE_CLIPBOARD_FILE)
 
     override val outgoingPacketTypes: Array<String> = arrayOf(PACKET_TYPE_CLIPBOARD, PACKET_TYPE_CLIPBOARD_CONNECT, PACKET_TYPE_CLIPBOARD_FILE)
 
@@ -141,6 +146,7 @@ class ClipboardPlugin : Plugin() {
             val item: ClipData.Item
             if (clipboardManager.hasPrimaryClip()) {
                 item = clipboardManager.primaryClip!!.getItemAt(0)
+                if (clipboardManager.primaryClip!!.description.hasMimeType("image/*")) return
                 val content = item.coerceToText(this.context).toString()
                 // Don't check if the content is sensitive, just send it
                 this.propagateClipboard(content)

@@ -10,6 +10,7 @@ import android.content.ClipData
 import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import androidx.core.content.getSystemService
 import org.kde.kdeconnect.helpers.ThreadHelper
@@ -43,6 +44,11 @@ class ClipboardListener {
         private set
 
     private val cm: ClipboardManager
+    var currentImageUri: Uri? = null
+        private set
+    private var revision = 0L
+    private var imageRequest = 0L
+    class ImageTransfer internal constructor(val request: Long, val revision: Long)
 
     private constructor(ctx: Context) {
         context = ctx.applicationContext
@@ -81,6 +87,10 @@ class ClipboardListener {
             val clip = cm.primaryClip ?: return // A denied locked-screen read is not a clipboard clear.
             if (clip.itemCount == 0) return
             val item = clip.getItemAt(0)
+            if (clip.description.hasMimeType("image/*")) {
+                onImageChanged(item.uri)
+                return // Never coerce a private image URI into a text clipboard packet.
+            }
             val content = item.coerceToText(context).toString()
             val contentType = detectContentType(clip)
 
@@ -90,9 +100,12 @@ class ClipboardListener {
         }
     }
 
+    @Synchronized
     fun onLsposedClipboardChanged(content: String?, sensitive: Boolean, timestamp: Long) {
         if (timestamp < updateTimestamp) return
         if (content == null) {
+            revision++
+            currentImageUri = null
             currentContent = null
             updateTimestamp = timestamp
             currentContentType = ClipboardContentType.Text
@@ -101,19 +114,26 @@ class ClipboardListener {
         updateContent(content, if (sensitive) ClipboardContentType.Password else ClipboardContentType.Text, timestamp)
     }
 
+    @Synchronized
     private fun updateContent(content: String, contentType: ClipboardContentType, timestamp: Long) {
         if (content == currentContent && contentType == currentContentType) return
+        revision++
+        currentImageUri = null
         updateTimestamp = timestamp
         currentContent = content
         currentContentType = contentType
         observers.toList().forEach { it.clipboardChanged(content, contentType) }
     }
 
+    @Synchronized
     fun setText(text: String?) {
         if (text == currentContent) return
         val previousContent = currentContent
         val previousType = currentContentType
         val previousTimestamp = updateTimestamp
+        val previousImage = currentImageUri
+        revision++
+        currentImageUri = null
         updateTimestamp = System.currentTimeMillis()
         currentContent = text
         currentContentType = ClipboardContentType.Text
@@ -125,6 +145,46 @@ class ClipboardListener {
             if (currentContent == text && updateTimestamp == writeTimestamp) {
                 currentContent = previousContent
                 currentContentType = previousType
+                updateTimestamp = previousTimestamp
+                currentImageUri = previousImage
+            }
+            throw error
+        }
+    }
+
+    @Synchronized
+    private fun onImageChanged(uri: Uri?) {
+        if (uri == currentImageUri) return
+        revision++
+        currentImageUri = uri
+        currentContent = null
+        currentContentType = ClipboardContentType.Text
+        updateTimestamp = System.currentTimeMillis()
+    }
+
+    @Synchronized
+    fun beginImageTransfer(): ImageTransfer = ImageTransfer(++imageRequest, revision)
+
+    @Synchronized
+    fun setImage(uri: Uri, transfer: ImageTransfer): Boolean {
+        if (transfer.request != imageRequest || transfer.revision != revision) return false
+        val previousText = currentContent
+        val previousType = currentContentType
+        val previousImage = currentImageUri
+        val previousTimestamp = updateTimestamp
+        currentContent = null
+        currentImageUri = uri
+        currentContentType = ClipboardContentType.Text
+        updateTimestamp = System.currentTimeMillis()
+        val writeRevision = ++revision
+        try {
+            cm.setPrimaryClip(ClipData.newUri(context.contentResolver, "KDE Connect image", uri))
+            return true
+        } catch (error: Exception) {
+            if (revision == writeRevision) {
+                currentContent = previousText
+                currentContentType = previousType
+                currentImageUri = previousImage
                 updateTimestamp = previousTimestamp
             }
             throw error

@@ -257,6 +257,10 @@ class NetworkPacket private constructor(
             inputStream?.closeSafe()
             inputSocket?.closeSafe()
         }
+
+        internal fun setReadTimeout(timeoutMillis: Int) {
+            inputSocket?.soTimeout = timeoutMillis
+        }
     }
 
     /** The on-the-wire representation of a packet */
